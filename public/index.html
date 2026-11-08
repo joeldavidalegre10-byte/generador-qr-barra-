@@ -1,90 +1,168 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Generador de Códigos de Barras y QR</title>
-<meta name="description" content="Crea códigos de barras y QR, configura la etiqueta, imprime o exporta a PDF.">
+<title>Barra Studio · Códigos de barras, QR e imagen a PDF</title>
+<meta name="description" content="Crea códigos de barras y QR, e imágenes a PDF. Todo se procesa en tu navegador.">
+<meta name="theme-color" content="#f4f3ee">
+<script>
+(function(){var t=null;try{t=localStorage.getItem('bs-theme')}catch(e){}
+if(t!=='dark'&&t!=='light')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+document.documentElement.setAttribute('data-theme',t);})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f4f3ee; --card:#fff; --panel:#f8f7f3; --line:#e5e3db; --ink:#16181a; --muted:#8a877e;
-  --green:#1f5c4b; --green-d:#174a3c; --mint:#e7f0ec; --chip:#efedE6;
-  --r:24px;
+  color-scheme:light;
+  --bg:#f4f3ee; --head:#f4f3eecc; --card:#fff; --panel:#f8f7f3; --line:#e5e3db; --ink:#16181a; --ink2:#6d6a63; --muted:#8a877e; --dim:#a8a59b;
+  --accent:#1f5c4b; --btn:#1f5c4b; --btn-h:#174a3c; --btn-ink:#fff; --btn-sh:#1f5c4b99;
+  --mint:#e7f0ec; --mint-line:#d5e5de; --mint-ink:#3d5b51;
+  --chip:#efede6; --seg-on:#fff; --seg-on-ink:#1f5c4b; --input:#fff; --off:#cfcdc5; --h1b:#77746d;
+  --shadow:0 12px 40px -18px #1f2a2433; --ring:#1f5c4b22; --danger:#b4321f; --warn:#9a6a12;
+}
+:root[data-theme=dark]{
+  color-scheme:dark;
+  --bg:#0c0d0d; --head:#0c0d0dcc; --card:#141716; --panel:#171a19; --line:#262a28; --ink:#f1f3f1; --ink2:#a3aca7; --muted:#76817b; --dim:#5d6761;
+  --accent:#4cc38f; --btn:#3d9c74; --btn-h:#47ad84; --btn-ink:#06130d; --btn-sh:#3d9c7455;
+  --mint:#15271f; --mint-line:#1f3a2e; --mint-ink:#5fd0a0;
+  --chip:#1f2322; --seg-on:#111413; --seg-on-ink:#4cc38f; --input:#0f1211; --off:#3a403d; --h1b:#8a948e;
+  --shadow:0 12px 40px -18px #000c; --ring:#4cc38f33; --danger:#ff8a78; --warn:#e5b04a;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.4}
 button,input,select{font:inherit;color:inherit}
-.wrap{max-width:1040px;margin:0 auto;padding:48px 24px 32px}
-.eyebrow{display:flex;align-items:center;gap:8px;font-size:.68rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--green)}
+button{-webkit-tap-highlight-color:transparent}
+.hide{display:none!important}
+
+/* ---------- Cabecera ---------- */
+.site{position:sticky;top:0;z-index:20;background:var(--head);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.site .in{max-width:1040px;margin:0 auto;padding:12px 24px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:34px;height:34px;border-radius:10px;background:var(--btn);color:var(--btn-ink);display:grid;place-items:center;flex:none}
+.logo svg{width:19px;height:19px}
+.brand b{display:block;font-size:.98rem;font-weight:600;letter-spacing:-.01em;line-height:1.1}
+.brand small{display:block;font-size:.55rem;letter-spacing:.17em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:3px;white-space:nowrap}
+.nav{display:flex;gap:4px;padding:4px;background:var(--chip);border:1px solid var(--line);border-radius:12px}
+.nav button{display:flex;align-items:center;gap:8px;border:0;background:transparent;padding:8px 16px;border-radius:9px;font-size:.78rem;font-weight:600;color:var(--ink2);cursor:pointer;white-space:nowrap;min-height:36px}
+.nav button svg{width:15px;height:15px;flex:none}
+.nav button[aria-selected=true]{background:var(--seg-on);color:var(--seg-on-ink);box-shadow:0 1px 3px #0003}
+.themebtn{justify-self:end;width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);display:grid;place-items:center;cursor:pointer}
+.themebtn svg{width:18px;height:18px}
+.themebtn .i-moon{display:none}
+:root[data-theme=light] .themebtn .i-sun{display:none}
+:root[data-theme=light] .themebtn .i-moon{display:block}
+
+/* ---------- Estructura ---------- */
+.wrap{max-width:1040px;margin:0 auto;padding:44px 24px 32px}
+.eyebrow{display:flex;align-items:center;gap:8px;font-size:.68rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
 .eyebrow svg{width:14px;height:14px}
 h1{margin:18px 0 14px;font-size:clamp(2.1rem,6.2vw,3.5rem);line-height:1.04;letter-spacing:-.035em;font-weight:500}
-h1 span{color:#77746d}
-.lead{margin:0 0 36px;color:#6d6a63;font-size:.95rem}
+h1 span{color:var(--h1b)}
+.lead{margin:0 0 36px;color:var(--ink2);font-size:.95rem}
 
-.app{display:grid;grid-template-columns:380px 1fr;background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 12px 40px -18px #1f2a2433;overflow:hidden}
+.app{display:grid;grid-template-columns:380px 1fr;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);overflow:hidden}
 .cfg{padding:26px 26px 28px}
-.pv{padding:26px 34px 28px;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column}
+.pv{padding:26px 34px 28px;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
 .head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:22px}
 .head h2{margin:0;font-size:1.15rem;font-weight:500;letter-spacing:-.01em}
 .head p{margin:4px 0 0;font-size:.72rem;color:var(--muted)}
-.badge{flex:none;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 11px;border-radius:99px;background:var(--mint);color:var(--green)}
-.badge.o{background:#fff;border:1px solid var(--line);color:#6d6a63;font-weight:500;letter-spacing:.04em;padding:6px 10px}
+.badge{flex:none;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 11px;border-radius:99px;background:var(--mint);color:var(--accent)}
+.badge.o{background:var(--card);border:1px solid var(--line);color:var(--ink2);font-weight:500;letter-spacing:.04em;padding:6px 10px}
 
-.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:5px;background:var(--chip);border-radius:14px;margin-bottom:22px}
-.seg button{white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:8px;border:0;background:transparent;padding:11px 8px;border-radius:10px;font-size:.78rem;font-weight:600;color:#7d7a72;cursor:pointer;min-height:44px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:5px;background:var(--chip);border-radius:14px;margin-bottom:22px}
+.seg.sm{margin-bottom:0}
+.seg button{white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:8px;border:0;background:transparent;padding:11px 8px;border-radius:10px;font-size:.78rem;font-weight:600;color:var(--ink2);cursor:pointer;min-height:44px}
+.seg.sm button{white-space:normal;text-align:center;font-size:.72rem;line-height:1.15;min-height:40px;padding:8px 6px}
 .seg button svg{width:16px;height:16px;flex:none}
-.seg button[aria-selected=true]{background:#fff;color:var(--green);box-shadow:0 1px 3px #0002}
+.seg button[aria-selected=true],.seg button[aria-checked=true]{background:var(--seg-on);color:var(--seg-on-ink);box-shadow:0 1px 3px #0003}
+.seg button:disabled{opacity:.4;cursor:not-allowed}
 
-label,.lbl{display:block;font-size:.64rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6d6a63;margin:0 0 8px}
+label,.lbl{display:block;font-size:.64rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);margin:0 0 8px}
+.grp{margin-bottom:20px}
 .field{position:relative;margin-bottom:8px}
-.field input{width:100%;height:48px;padding:0 44px 0 14px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:.88rem;font-family:ui-monospace,"Courier New",monospace;outline:none}
-.field input:focus,select:focus,.step:focus-within{border-color:var(--green);box-shadow:0 0 0 3px #1f5c4b22}
-.field svg{position:absolute;right:14px;top:50%;width:18px;height:18px;transform:translateY(-50%);color:#b3b0a7;pointer-events:none}
+.field input{width:100%;height:48px;padding:0 44px 0 14px;border:1px solid var(--line);border-radius:12px;background:var(--input);font-size:.88rem;font-family:ui-monospace,"Courier New",monospace;outline:none}
+.field input::placeholder{color:var(--dim)}
+.field input:focus,select:focus,.step:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+.field svg{position:absolute;right:14px;top:50%;width:18px;height:18px;transform:translateY(-50%);color:var(--dim);pointer-events:none}
 .hint{font-size:.68rem;color:var(--muted);margin:0 0 22px}
-.hint.err{color:#b4321f}
-.hint.warn{color:#9a6a12}
+.hint.err{color:var(--danger)}
+.hint.warn{color:var(--warn)}
 
 .two{display:grid;grid-template-columns:1fr 124px;gap:14px;margin-bottom:22px}
-select{width:100%;height:48px;padding:0 34px 0 14px;border:1px solid var(--line);border-radius:12px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a877e' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;appearance:none;-webkit-appearance:none;font-size:.82rem;outline:none}
-.step{display:grid;grid-template-columns:40px 1fr 40px;height:48px;border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
-.step button{border:0;background:transparent;font-size:1.1rem;color:#6d6a63;cursor:pointer}
+select{width:100%;height:48px;padding:0 34px 0 14px;border:1px solid var(--line);border-radius:12px;background:var(--input) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a877e' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;appearance:none;-webkit-appearance:none;font-size:.82rem;outline:none}
+.step{display:grid;grid-template-columns:40px 1fr 40px;height:48px;border:1px solid var(--line);border-radius:12px;background:var(--input);overflow:hidden}
+.step button{border:0;background:transparent;font-size:1.1rem;color:var(--ink2);cursor:pointer}
 .step button:active{background:var(--chip)}
-.step input{width:100%;border:0;border-left:1px solid var(--line);border-right:1px solid var(--line);text-align:center;font-size:.9rem;outline:none;background:#fff;-moz-appearance:textfield}
+.step input{width:100%;border:0;border-left:1px solid var(--line);border-right:1px solid var(--line);text-align:center;font-size:.9rem;outline:none;background:var(--input);-moz-appearance:textfield}
 .step input::-webkit-outer-spin-button,.step input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
 hr{border:0;border-top:1px solid var(--line);margin:0 0 20px}
 .sw{display:flex;align-items:center;gap:12px;margin-bottom:20px}
-.sw .ic{width:40px;height:40px;border-radius:12px;background:var(--chip);display:grid;place-items:center;color:#6d6a63;flex:none}
+.sw .ic{width:40px;height:40px;border-radius:12px;background:var(--chip);display:grid;place-items:center;color:var(--ink2);flex:none}
 .sw .ic svg{width:18px;height:18px}
 .sw b{display:block;font-size:.84rem;font-weight:600}
 .sw small{font-size:.7rem;color:var(--muted)}
 .sw .t{flex:1}
-.toggle{flex:none;width:44px;height:26px;border-radius:99px;border:0;background:#cfcdc5;position:relative;cursor:pointer;transition:background .15s}
+.toggle{flex:none;width:44px;height:26px;border-radius:99px;border:0;background:var(--off);position:relative;cursor:pointer;transition:background .15s}
 .toggle::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0003;transition:transform .15s}
-.toggle[aria-checked=true]{background:var(--green)}
+.toggle[aria-checked=true]{background:var(--btn)}
 .toggle[aria-checked=true]::after{transform:translateX(18px)}
-.info{display:flex;gap:10px;padding:13px 14px;border-radius:12px;background:var(--mint);border:1px solid #d5e5de;color:#3d5b51;font-size:.72rem}
+.info{display:flex;gap:10px;padding:13px 14px;border-radius:12px;background:var(--mint);border:1px solid var(--mint-line);color:var(--mint-ink);font-size:.72rem}
 .info svg{width:15px;height:15px;flex:none;margin-top:1px}
 
+/* ---------- Códigos: vista previa ---------- */
 .stage{flex:1;display:grid;place-items:center;padding:8px 0 4px}
-.zone{position:relative;width:100%;max-width:470px;padding:26px 26px;border:1.5px dashed #cfccc2;border-radius:22px;display:grid;place-items:center;min-height:250px}
-.zone .tag{position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);background:var(--panel);padding:0 8px;font-size:.55rem;letter-spacing:.14em;color:#a8a59b;font-weight:600;text-transform:uppercase;white-space:nowrap}
-.label{width:100%;max-width:420px;background:#fff;border-radius:14px;box-shadow:0 8px 24px -10px #1f2a2440,0 0 0 1px #0000000a;overflow:hidden;line-height:0}
-.label svg{width:100%;height:auto;display:block}
-.empty{padding:30px;line-height:1.4;font-size:.8rem;color:var(--muted);text-align:center}
+.zone{position:relative;width:100%;max-width:470px;padding:26px;border:1.5px dashed var(--line);border-radius:22px;display:grid;place-items:center;min-height:250px}
+.zone .tag{position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);background:var(--panel);padding:0 8px;font-size:.55rem;letter-spacing:.14em;color:var(--dim);font-weight:600;text-transform:uppercase;white-space:nowrap}
+.zone .tag.top{bottom:auto;top:-8px;color:var(--accent)}
+.label{width:100%;max-width:420px;background:#fff;border-radius:14px;box-shadow:0 8px 24px -10px #0006,0 0 0 1px #0000000a;overflow:hidden;line-height:0}
+.label svg{width:100%;height:auto;display:block;transition:opacity .15s}
+.label.sample svg{opacity:.5}
 .actions{display:grid;grid-template-columns:1fr 1.25fr;gap:14px;margin-top:26px}
-.btn{display:flex;align-items:center;justify-content:center;gap:9px;height:52px;border-radius:14px;font-size:.85rem;font-weight:600;cursor:pointer;border:1px solid var(--line);background:#fff}
-.btn svg{width:17px;height:17px}
-.btn.p{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 8px 18px -8px #1f5c4b99}
-.btn.p:hover{background:var(--green-d)}
+.btn{display:flex;align-items:center;justify-content:center;gap:9px;height:52px;border-radius:14px;font-size:.85rem;font-weight:600;cursor:pointer;border:1px solid var(--line);background:var(--card);padding:0 16px}
+.btn svg{width:17px;height:17px;flex:none}
+.btn.p{background:var(--btn);border-color:var(--btn);color:var(--btn-ink);box-shadow:0 8px 18px -8px var(--btn-sh)}
+.btn.p:hover:not(:disabled){background:var(--btn-h)}
 .btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
-.foot{margin-top:22px;text-align:center;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:#a8a59b}
-
+.foot{margin-top:22px;text-align:center;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
 #printArea{display:none}
+
+/* ---------- Imagen a PDF ---------- */
+.drop{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;min-height:300px;padding:28px;border:1.5px dashed var(--line);border-radius:22px;cursor:pointer;transition:border-color .15s,background .15s;outline:none}
+.drop:hover,.drop:focus-visible,.drop.over{border-color:var(--accent);background:var(--mint)}
+.drop{margin:0;text-transform:none;letter-spacing:normal;font-weight:400;color:var(--ink)}
+.drop .up{width:48px;height:48px;border-radius:14px;background:var(--mint);color:var(--accent);display:grid;place-items:center;margin-bottom:12px}
+.drop .up svg{width:22px;height:22px}
+.drop b{font-size:.95rem;font-weight:600}
+.drop small{font-size:.7rem;color:var(--muted)}
+.drop.compact{min-height:0;flex-direction:row;gap:14px;padding:14px 18px;justify-content:flex-start;text-align:left}
+.drop.compact .up{width:38px;height:38px;margin:0}
+.drop.compact .up svg{width:18px;height:18px}
+.drop.compact b{font-size:.85rem}
+.drop input{display:none}
+.msg{min-height:18px;margin:10px 2px 0;font-size:.72rem;color:var(--danger)}
+.listbar{display:flex;align-items:center;justify-content:space-between;margin:18px 2px 12px}
+.listbar span{font-size:.74rem;color:var(--ink2);font-weight:600}
+.link{border:0;background:transparent;color:var(--accent);font-size:.74rem;font-weight:600;cursor:pointer;padding:6px 4px}
+.thumbs{align-items:start;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.thumb{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.thumb .im{position:relative;aspect-ratio:4/3;background:var(--chip);display:grid;place-items:center}
+.thumb img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.thumb .n{position:absolute;left:8px;top:8px;min-width:22px;height:22px;padding:0 6px;border-radius:99px;background:var(--btn);color:var(--btn-ink);font-size:.66rem;font-weight:700;display:grid;place-items:center}
+.thumb .nm{padding:8px 10px 2px;font-size:.7rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.thumb .sz{padding:0 10px 6px;font-size:.62rem;color:var(--muted)}
+.thumb .ac{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}
+.thumb .ac button{height:38px;border:0;background:transparent;color:var(--ink2);cursor:pointer;display:grid;place-items:center}
+.thumb .ac button+button{border-left:1px solid var(--line)}
+.thumb .ac button:hover:not(:disabled){background:var(--chip);color:var(--ink)}
+.thumb .ac button:disabled{opacity:.3;cursor:not-allowed}
+.thumb .ac svg{width:15px;height:15px}
+.pdfgo{margin-top:auto;padding-top:20px}
+.pdfgo .btn{width:100%;height:52px}
 
 /* ---------- Móvil / tablet ---------- */
 @media (max-width:860px){
@@ -94,18 +172,24 @@ hr{border:0;border-top:1px solid var(--line);margin:0 0 20px}
   .pv{border-left:0;border-top:1px solid var(--line);padding:22px 16px 24px}
   .cfg{padding:22px 16px 24px}
   .zone{padding:18px 14px;min-height:0}
+  .drop{min-height:220px}
+  .site .in{grid-template-columns:1fr auto;padding:10px 16px}
+  .nav{grid-column:1/-1;grid-row:2}
+  .nav button{flex:1;justify-content:center;padding:9px 10px}
+  .brand small{display:none}
 }
 @media (max-width:420px){
   .two{grid-template-columns:1fr}
   .actions{grid-template-columns:1fr}
   .actions .p{order:-1}
   .seg button{font-size:.74rem;gap:6px}
+  .thumbs{grid-template-columns:repeat(2,1fr)}
 }
 
 /* ---------- Impresión ---------- */
 @media print{
   html,body{background:#fff}
-  .wrap{display:none}
+  .site,.wrap{display:none!important}
   #printArea{display:block}
   .plabel{page-break-after:always;break-after:page;overflow:hidden}
   .plabel:last-child{page-break-after:auto;break-after:auto}
@@ -115,7 +199,30 @@ hr{border:0;border-top:1px solid var(--line);margin:0 0 20px}
 <style id="pageStyle"></style>
 </head>
 <body>
+
+<header class="site">
+  <div class="in">
+    <div class="brand">
+      <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5v14M8 5v14M12 5v14M16 5v14M20 5v14" stroke-width="1.8"/></svg></div>
+      <div><b>Barra Studio</b><small>Herramientas de etiquetas y PDF</small></div>
+    </div>
+    <nav class="nav" role="tablist" aria-label="Herramientas">
+      <button role="tab" data-tool="codes" aria-selected="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5v14M8 5v14M12 5v14M16 5v14M20 5v14"/></svg>Códigos</button>
+      <button role="tab" data-tool="pdf" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="1.6"/><path d="m21 15-4.5-4.5L6 21"/></svg>Imagen a PDF</button>
+    </nav>
+    <button class="themebtn" id="theme" type="button" aria-label="Cambiar entre modo claro y oscuro" title="Cambiar tema">
+      <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+</header>
+
 <div class="wrap">
+
+<!-- ======================= CÓDIGOS ======================= -->
+<section id="tool-codes">
   <div class="eyebrow">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.1 11 7.5l3.4 1.1-3.4 1.1-1.1 3.4-1.1-3.4-3.4-1.1 3.4-1.1z"/><path d="m17 13 .7 2.3 2.3.7-2.3.7-.7 2.3-.7-2.3-2.3-.7 2.3-.7z"/></svg>
     Herramienta de etiquetado
@@ -139,7 +246,7 @@ hr{border:0;border-top:1px solid var(--line);margin:0 0 20px}
 
       <label for="content">Contenido del código</label>
       <div class="field">
-        <input id="content" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="32" value="8437012345678">
+        <input id="content" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="32" value="" placeholder="Ej. 8437012345678">
         <svg id="fieldIc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 5v14M8 5v14M12 5v14M16 5v14M20 5v14"/></svg>
       </div>
       <p class="hint" id="hint">Admite números, letras y símbolos · máximo 32 caracteres</p>
@@ -183,6 +290,7 @@ hr{border:0;border-top:1px solid var(--line);margin:0 0 20px}
       </div>
       <div class="stage">
         <div class="zone" id="zone">
+          <span class="tag top hide" id="sampleTag">Ejemplo · escribe tu contenido</span>
           <div class="label" id="label"></div>
           <span class="tag">Área de etiqueta</span>
         </div>
@@ -196,10 +304,93 @@ hr{border:0;border-top:1px solid var(--line);margin:0 0 20px}
     </section>
   </main>
   <div class="foot" id="foot">Code 128 · Alta resolución · Listo para impresión</div>
+</section>
+
+<!-- ======================= IMAGEN A PDF ======================= -->
+<section id="tool-pdf" class="hide">
+  <div class="eyebrow">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.1 11 7.5l3.4 1.1-3.4 1.1-1.1 3.4-1.1-3.4-3.4-1.1 3.4-1.1z"/><path d="m17 13 .7 2.3 2.3.7-2.3.7-.7 2.3-.7-2.3-2.3-.7 2.3-.7z"/></svg>
+    Conversor de documentos
+  </div>
+  <h1>Convierte imágenes a PDF,<br><span>sin subir nada.</span></h1>
+  <p class="lead">Todo se procesa en tu navegador: tus archivos nunca salen de tu dispositivo.</p>
+
+  <div class="app">
+    <section class="cfg" aria-label="Opciones del PDF">
+      <div class="head">
+        <div><h2>Opciones del PDF</h2><p>Define el formato de las páginas</p></div>
+      </div>
+
+      <div class="grp">
+        <span class="lbl" id="l-size">Tamaño de página</span>
+        <div class="seg sm" role="radiogroup" aria-labelledby="l-size" data-opt="size">
+          <button type="button" role="radio" data-v="a4" aria-checked="true">A4</button>
+          <button type="button" role="radio" data-v="letter" aria-checked="false">Carta</button>
+          <button type="button" role="radio" data-v="fit" aria-checked="false">Ajustar a imagen</button>
+        </div>
+      </div>
+      <div class="grp">
+        <span class="lbl" id="l-ori">Orientación</span>
+        <div class="seg sm" role="radiogroup" aria-labelledby="l-ori" data-opt="ori">
+          <button type="button" role="radio" data-v="auto" aria-checked="true">Automática</button>
+          <button type="button" role="radio" data-v="p" aria-checked="false">Vertical</button>
+          <button type="button" role="radio" data-v="l" aria-checked="false">Horizontal</button>
+        </div>
+      </div>
+      <div class="grp">
+        <span class="lbl" id="l-mar">Margen</span>
+        <div class="seg sm" role="radiogroup" aria-labelledby="l-mar" data-opt="margin">
+          <button type="button" role="radio" data-v="0" aria-checked="false">Sin margen</button>
+          <button type="button" role="radio" data-v="36" aria-checked="true">Normal</button>
+          <button type="button" role="radio" data-v="72" aria-checked="false">Amplio</button>
+        </div>
+      </div>
+      <div class="grp">
+        <span class="lbl" id="l-q">Calidad</span>
+        <div class="seg sm" role="radiogroup" aria-labelledby="l-q" data-opt="quality">
+          <button type="button" role="radio" data-v="low" aria-checked="false">Ligera</button>
+          <button type="button" role="radio" data-v="mid" aria-checked="true">Equilibrada</button>
+          <button type="button" role="radio" data-v="high" aria-checked="false">Máxima</button>
+        </div>
+      </div>
+
+      <div class="info">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg>
+        <span>Cada imagen ocupa una página. Las transparencias se rellenan en blanco.</span>
+      </div>
+    </section>
+
+    <section class="pv" aria-label="Tus imágenes">
+      <div class="head">
+        <div><h2>Tus imágenes</h2><p>Añade una o varias imágenes</p></div>
+      </div>
+
+      <label class="drop" id="drop" tabindex="0" for="files">
+        <span class="up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></span>
+        <span><b id="dropTitle">Arrastra tus imágenes aquí</b><br><small>o haz clic para seleccionarlas · JPG, PNG, WebP, GIF</small></span>
+        <input id="files" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp" multiple>
+      </label>
+      <div class="msg" id="pdfMsg" role="status" aria-live="polite"></div>
+
+      <div id="listWrap" class="hide">
+        <div class="listbar"><span id="count">0 imágenes</span><button type="button" class="link" id="clear">Vaciar lista</button></div>
+        <div class="thumbs" id="thumbs"></div>
+      </div>
+
+      <div class="pdfgo">
+        <button class="btn p" id="convert" type="button" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5M4 20h16"/></svg><span id="convertTxt">Convertir y descargar PDF</span></button>
+      </div>
+    </section>
+  </div>
+</section>
+
 </div>
 <div id="printArea" aria-hidden="true"></div>
 
 <script src="js/qr.js"></script>
-<script src="js/app.js"></script>
+<script src="js/codes.js"></script>
+<script src="js/imgpdf.js"></script>
+<script src="js/ui.js"></script>
 </body>
 </html>
