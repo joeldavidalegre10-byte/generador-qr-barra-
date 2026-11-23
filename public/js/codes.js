@@ -52,7 +52,7 @@
       text: show ? { str: text, cx: w / 2, y: top + barsH + 6.3, size: sz, cs: sz * 0.14 } : null };
   }
 
-  function layoutQr(text, w, h, show) {
+  function layoutQr(text, w, h, show, label) {
     var Q = window.QRCodeLib;
     var qr = new Q.QRCode(-1, Q.ErrorCorrectLevel.M);
     qr.addData(unescape(encodeURIComponent(text)));
@@ -70,9 +70,10 @@
         if (!dark && start >= 0) { rects.push([x0 + start * cell, y0 + r * cell, (c - start) * cell, cell]); start = -1; }
       }
     }
-    var sz = Math.min(textSize(text, w), 3.4);
+    var shownText = label != null ? label : text;
+    var sz = Math.min(textSize(shownText, w), 3.4);
     return { w: w, h: h, rects: rects, mw: cell,
-      text: show ? { str: text.length > 40 ? text.slice(0, 39) + '…' : text, cx: w / 2, y: y0 + q + 2 * cell + 4.2, size: sz, cs: sz * 0.06 } : null };
+      text: show && shownText ? { str: shownText.length > 40 ? shownText.slice(0, 39) + '…' : shownText, cx: w / 2, y: y0 + q + 2 * cell + 4.2, size: sz, cs: sz * 0.06 } : null };
   }
 
   /* ---------- Render ---------- */
@@ -155,13 +156,16 @@
   $('copies').addEventListener('change', function (e) { setCopies(e.target.value); });
 
   /* ---------- Imprimir ---------- */
-  $('print').onclick = function () {
-    if (!current) return;
-    var wh = SIZES[state.size], html = '', i;
-    for (i = 0; i < state.copies; i++) html += '<div class="plabel" style="width:' + wh[0] + 'mm;height:' + wh[1] + 'mm">' + svgOf(current) + '</div>';
+  function printLabels(L, wh, copies) {
+    var html = '', i;
+    for (i = 0; i < copies; i++) html += '<div class="plabel" style="width:' + wh[0] + 'mm;height:' + wh[1] + 'mm">' + svgOf(L) + '</div>';
     $('printArea').innerHTML = html;
     $('pageStyle').textContent = '@page{size:' + wh[0] + 'mm ' + wh[1] + 'mm;margin:0}';
     setTimeout(function () { window.print(); }, 50);
+  }
+  $('print').onclick = function () {
+    if (!current) return;
+    printLabels(current, SIZES[state.size], state.copies);
   };
 
   /* ---------- PDF vectorial (sin librerías) ---------- */
@@ -198,16 +202,24 @@
     for (i = 0; i < out.length; i++) u8[i] = out.charCodeAt(i) & 255;
     return u8;
   }
-  $('pdf').onclick = function () {
-    if (!current) return;
-    var blob = new Blob([makePdf(current, state.copies)], { type: 'application/pdf' });
+  function downloadPdf(L, copies, rawName) {
+    var blob = new Blob([makePdf(L, copies)], { type: 'application/pdf' });
     var a = document.createElement('a');
-    var name = (state.vals[state.mode] || 'etiqueta').replace(/[^\w.-]+/g, '_').slice(0, 30);
+    var name = (rawName || 'etiqueta').replace(/[^\w.-]+/g, '_').slice(0, 30);
     a.href = URL.createObjectURL(blob); a.download = 'etiqueta-' + name + '.pdf';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+  }
+  $('pdf').onclick = function () {
+    if (!current) return;
+    downloadPdf(current, state.copies, state.vals[state.mode]);
   };
 
   window.__app = { encode128: encode128, state: state };
+  // Utilidades compartidas con la sección de códigos dinámicos
+  window.CodeKit = {
+    SIZES: SIZES, layoutBar: layoutBar, layoutQr: layoutQr, svgOf: svgOf, esc: esc,
+    printLabels: printLabels, downloadPdf: downloadPdf
+  };
   render();
 })();
