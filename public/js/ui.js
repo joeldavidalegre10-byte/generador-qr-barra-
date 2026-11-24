@@ -15,14 +15,12 @@
 
   var tabs = document.querySelectorAll('.nav button');
   function show(tool) {
-    if (tool !== 'pdf' && tool !== 'dyn') tool = 'codes';
+    if (tool !== 'pdf') tool = 'codes';
     document.getElementById('tool-codes').classList.toggle('hide', tool !== 'codes');
     document.getElementById('tool-pdf').classList.toggle('hide', tool !== 'pdf');
-    document.getElementById('tool-dyn').classList.toggle('hide', tool !== 'dyn');
     Array.prototype.forEach.call(tabs, function (b) { b.setAttribute('aria-selected', b.getAttribute('data-tool') === tool); });
-    try { history.replaceState(null, '', tool === 'pdf' ? '#imagen-a-pdf' : tool === 'dyn' ? '#dinamicos' : '#codigos'); } catch (e) {}
+    try { history.replaceState(null, '', tool === 'pdf' ? '#imagen-a-pdf' : '#codigos'); } catch (e) {}
   }
   Array.prototype.forEach.call(tabs, function (b) { b.onclick = function () { show(b.getAttribute('data-tool')); window.scrollTo(0, 0); }; });
-  window.showTool = show;
-  show(location.hash === '#imagen-a-pdf' ? 'pdf' : location.hash === '#dinamicos' ? 'dyn' : 'codes');
+  show(location.hash === '#imagen-a-pdf' ? 'pdf' : 'codes');
 })();
